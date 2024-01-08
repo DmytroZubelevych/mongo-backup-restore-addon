@@ -175,7 +175,7 @@ function BackupManager(config) {
                 '[ -n "${SNAPSHOT_ID}" ] || false',
 		'source /etc/jelastic/metainf.conf',
 		'RESTIC_PASSWORD=$(cat /root/.backupedenv) restic -r /opt/backup/$(cat /root/.backupedenv) restore ${SNAPSHOT_ID} --target /',
-		'mongorestore --host=localhost --port=3017 --username=%(dbuser) --password=%(dbpass) --authenticationDatabase=admin ~/dump',
+		'mongorestore --host=localhost --port=27017 --username=%(dbuser) --password=%(dbpass) --authenticationDatabase=admin ~/dump',
 		'jem service restart'
             ], {
                 nodeId : config.backupExecNode,
