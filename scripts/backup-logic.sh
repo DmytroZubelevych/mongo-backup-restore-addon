@@ -30,6 +30,12 @@ else
     fi 
 fi
 
+if grep -q '^replication' /etc/mongod.conf; then
+    MONGO_TYPE="-replica-set"
+else
+    MONGO_TYPE="-standalone"
+fi
+
 source /etc/jelastic/metainf.conf;
 
 function sendEmailNotification(){
@@ -89,7 +95,7 @@ function rotate_snapshots(){
 function create_snapshot(){
     source /etc/jelastic/metainf.conf 
     echo $(date) ${ENV_NAME} "Saving the DB dump to ${DUMP_NAME} snapshot" | tee -a ${BACKUP_LOG_FILE}
-    DUMP_NAME=$(date "+%F_%H%M%S"-${BACKUP_TYPE}\($COMPUTE_TYPE-$COMPUTE_TYPE_FULL_VERSION$REDIS_TYPE\))
+    DUMP_NAME=$(date "+%F_%H%M%S"-${BACKUP_TYPE}\($COMPUTE_TYPE-$COMPUTE_TYPE_FULL_VERSION$MONGO_TYPE\))
     GOGC=20 RESTIC_COMPRESSION=off RESTIC_PACK_SIZE=8 RESTIC_PASSWORD=${ENV_NAME} restic backup -q -r /opt/backup/${ENV_NAME} --tag "${DUMP_NAME} ${BACKUP_ADDON_COMMIT_ID} ${BACKUP_TYPE}" ~/dump | tee -a ${BACKUP_LOG_FILE}
 }
 
