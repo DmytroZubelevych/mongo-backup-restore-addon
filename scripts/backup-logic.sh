@@ -110,7 +110,7 @@ function backup(){
     else
         RS_SUFFIX="";
     fi
-    mongodump -u ${DBUSER} -p ${DBPASSWD} --uri="mongo://localhost${RS_SUFFIX}" --authenticationDatabase=admin
+    mongodump -u ${DBUSER} -p ${DBPASSWD} --uri="mongodb://localhost${RS_SUFFIX}" --authenticationDatabase=admin
     rm -f /var/run/${ENV_NAME}_backup.pid
 }
 
