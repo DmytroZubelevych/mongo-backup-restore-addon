@@ -104,7 +104,13 @@ function backup(){
     echo $(date) ${ENV_NAME} "Creating the ${BACKUP_TYPE} backup (using the backup addon with commit id ${BACKUP_ADDON_COMMIT_ID}) on storage node ${NODE_ID}" | tee -a ${BACKUP_LOG_FILE}
     source /etc/jelastic/metainf.conf;
     echo $(date) ${ENV_NAME} "Creating the DB dump" | tee -a ${BACKUP_LOG_FILE}
-    mongodump -u ${DBUSER} -p ${DBPASSWD} --host localhost:27017 --authenticationDatabase=admin
+    if grep -q ^[[:space:]]*replSetName /etc/mongod.conf; then
+        RS_NAME=$(grep ^[[:space:]]*replSetName /etc/mongod.conf|awk '{print $2}');
+	RS_SUFFIX="/?replicaSet=${RS_NAME}&readPreference=nearest";
+    else
+        RS_SUFFIX="";
+    fi
+    mongodump -u ${DBUSER} -p ${DBPASSWD} --uri="mongo://localhost${RS_SUFFIX}" --authenticationDatabase=admin
     rm -f /var/run/${ENV_NAME}_backup.pid
 }
 
