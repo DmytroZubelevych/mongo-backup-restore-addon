@@ -175,7 +175,8 @@ function BackupManager(config) {
                 '[ -n "${SNAPSHOT_ID}" ] || false',
 		'source /etc/jelastic/metainf.conf',
 		'RESTIC_PASSWORD=$(cat /root/.backupedenv) restic -r /opt/backup/$(cat /root/.backupedenv) restore ${SNAPSHOT_ID} --target /',
-		'mongorestore --host=localhost --port=27017 --username=%(dbuser) --password=%(dbpass) --authenticationDatabase=admin ~/dump',
+		'if grep -q ^[[:space:]]*replSetName /etc/mongod.conf; then export RS_NAME=$(grep ^[[:space:]]*replSetName /etc/mongod.conf|awk '{print $2}'); export RS_SUFFIX="/?replicaSet=${RS_NAME}&readPreference=nearest"; else export RS_SUFFIX=""; fi',
+		'mongorestore --uri=\"mongo://localhost${RS_SUFFIX}\" --username=%(dbuser) --password=%(dbpass) --authenticationDatabase=admin ~/dump',
 		'jem service restart'
             ], {
                 nodeId : config.backupExecNode,
