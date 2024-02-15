@@ -171,12 +171,13 @@ function BackupManager(config) {
             [ me.addMountForRestore ],
             [ me.cmd, [
 		'echo $(date) %(envName) Restoring the snapshot $(cat /root/.backupid)', 
+		'restic self-update 2>&1 || return 0',
                 'SNAPSHOT_ID=$(RESTIC_PASSWORD=$(cat /root/.backupedenv) restic -r /opt/backup/$(cat /root/.backupedenv) snapshots|grep $(cat /root/.backupid)|awk \'{print $1}\')',
                 '[ -n "${SNAPSHOT_ID}" ] || false',
 		'source /etc/jelastic/metainf.conf',
 		'RESTIC_PASSWORD=$(cat /root/.backupedenv) restic -r /opt/backup/$(cat /root/.backupedenv) restore ${SNAPSHOT_ID} --target /',
 		'if grep -q ^[[:space:]]*replSetName /etc/mongod.conf; then export RS_NAME=$(grep ^[[:space:]]*replSetName /etc/mongod.conf|awk \'{print $2}\'); export RS_SUFFIX="/?replicaSet=${RS_NAME}&readPreference=nearest"; else export RS_SUFFIX=""; fi',
-		'mongorestore --uri=\"mongodb://localhost${RS_SUFFIX}\" --username=%(dbuser) --password=%(dbpass) --authenticationDatabase=admin ~/dump',
+		'mongorestore --uri=\"mongodb://%(dbuser):%(dbpass)@localhost${RS_SUFFIX}\" ~/dump',
 		'jem service restart'
             ], {
                 nodeId : config.backupExecNode,

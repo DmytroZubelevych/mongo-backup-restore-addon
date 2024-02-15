@@ -63,7 +63,7 @@ function sendEmailNotification(){
 }
 
 function update_restic(){
-    restic self-update 2>&1;
+    restic self-update 2>&1 || return 0;
 }
 
 function check_backup_repo(){
@@ -110,7 +110,7 @@ function backup(){
     else
         RS_SUFFIX="";
     fi
-    mongodump -u ${DBUSER} -p ${DBPASSWD} --uri="mongodb://localhost${RS_SUFFIX}" --authenticationDatabase=admin
+    mongodump --uri="mongodb://${DBUSER}:${DBPASSWD}@localhost${RS_SUFFIX}"
     rm -f /var/run/${ENV_NAME}_backup.pid
 }
 
