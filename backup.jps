@@ -11,6 +11,7 @@ targetNodes:
   nodeType: 
     - mongodb-dockerized
     - mongodb
+    - mongo
 
 settings:
   main:
